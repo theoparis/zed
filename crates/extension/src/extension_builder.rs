@@ -24,25 +24,7 @@ use wit_component::ComponentEncoder;
 ///
 /// Once Rust 1.78 is released, there will be a `wasm32-wasip2` target available, so we will
 /// not need the adapter anymore.
-const RUST_TARGET: &str = "wasm32-wasip1";
-pub const WASI_ADAPTER_URL: &str =
-    "https://github.com/bytecodealliance/wasmtime/releases/download/v18.0.2/wasi_snapshot_preview1.reactor.wasm";
-
-/// Compiling Tree-sitter parsers from C to WASM requires Clang 17, and a WASM build of libc
-/// and clang's runtime library. The `wasi-sdk` provides these binaries.
-///
-/// Once Clang 17 and its wasm target are available via system package managers, we won't need
-/// to download this.
-const WASI_SDK_URL: &str = "https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-21/";
-const WASI_SDK_ASSET_NAME: Option<&str> = if cfg!(target_os = "macos") {
-    Some("wasi-sdk-21.0-macos.tar.gz")
-} else if cfg!(target_os = "linux") {
-    Some("wasi-sdk-21.0-linux.tar.gz")
-} else if cfg!(target_os = "windows") {
-    Some("wasi-sdk-21.0.m-mingw.tar.gz")
-} else {
-    None
-};
+const RUST_TARGET: &str = "wasm32-wasip2";
 
 pub struct ExtensionBuilder {
     cache_dir: PathBuf,
@@ -120,9 +102,6 @@ impl ExtensionBuilder {
         manifest: &mut ExtensionManifest,
         options: CompileExtensionOptions,
     ) -> Result<(), anyhow::Error> {
-        self.install_rust_wasm_target_if_needed()?;
-        let adapter_bytes = self.install_wasi_preview1_adapter_if_needed().await?;
-
         let cargo_toml_content = fs::read_to_string(extension_dir.join("Cargo.toml"))?;
         let cargo_toml: CargoToml = toml::from_str(&cargo_toml_content)?;
 
@@ -166,20 +145,7 @@ impl ExtensionBuilder {
         let wasm_bytes = fs::read(&wasm_path)
             .with_context(|| format!("failed to read output module `{}`", wasm_path.display()))?;
 
-        let encoder = ComponentEncoder::default()
-            .module(&wasm_bytes)?
-            .adapter("wasi_snapshot_preview1", &adapter_bytes)
-            .context("failed to load adapter module")?
-            .validate(true);
-
-        log::info!(
-            "encoding wasm component for extension {}",
-            extension_dir.display()
-        );
-
-        let component_bytes = encoder
-            .encode()
-            .context("failed to encode wasm component")?;
+        let component_bytes = wasm_bytes;
 
         let component_bytes = self
             .strip_custom_sections(&component_bytes)
@@ -209,7 +175,7 @@ impl ExtensionBuilder {
         grammar_name: &str,
         grammar_metadata: &GrammarManifestEntry,
     ) -> Result<()> {
-        let clang_path = self.install_wasi_sdk_if_needed().await?;
+        let clang_path = "/usr/local/wasi-sdk/bin/clang";
 
         let mut grammar_repo_dir = extension_dir.to_path_buf();
         grammar_repo_dir.extend(["grammars", grammar_name]);
@@ -372,80 +338,6 @@ impl ExtensionBuilder {
         }
 
         Ok(())
-    }
-
-    async fn install_wasi_preview1_adapter_if_needed(&self) -> Result<Vec<u8>> {
-        let cache_path = self.cache_dir.join("wasi_snapshot_preview1.reactor.wasm");
-        if let Ok(content) = fs::read(&cache_path) {
-            if Parser::is_core_wasm(&content) {
-                return Ok(content);
-            }
-        }
-
-        fs::remove_file(&cache_path).ok();
-
-        log::info!(
-            "downloading wasi adapter module to {}",
-            cache_path.display()
-        );
-        let mut response = self
-            .http
-            .get(WASI_ADAPTER_URL, AsyncBody::default(), true)
-            .await?;
-
-        let mut content = Vec::new();
-        let mut body = BufReader::new(response.body_mut());
-        body.read_to_end(&mut content).await?;
-
-        fs::write(&cache_path, &content)
-            .with_context(|| format!("failed to save file {}", cache_path.display()))?;
-
-        if !Parser::is_core_wasm(&content) {
-            bail!("downloaded wasi adapter is invalid");
-        }
-        Ok(content)
-    }
-
-    async fn install_wasi_sdk_if_needed(&self) -> Result<PathBuf> {
-        let url = if let Some(asset_name) = WASI_SDK_ASSET_NAME {
-            format!("{WASI_SDK_URL}/{asset_name}")
-        } else {
-            bail!("wasi-sdk is not available for platform {}", env::consts::OS);
-        };
-
-        let wasi_sdk_dir = self.cache_dir.join("wasi-sdk");
-        let mut clang_path = wasi_sdk_dir.clone();
-        clang_path.extend(["bin", &format!("clang{}", env::consts::EXE_SUFFIX)]);
-
-        if fs::metadata(&clang_path).map_or(false, |metadata| metadata.is_file()) {
-            return Ok(clang_path);
-        }
-
-        let mut tar_out_dir = wasi_sdk_dir.clone();
-        tar_out_dir.set_extension("archive");
-
-        fs::remove_dir_all(&wasi_sdk_dir).ok();
-        fs::remove_dir_all(&tar_out_dir).ok();
-
-        log::info!("downloading wasi-sdk to {}", wasi_sdk_dir.display());
-        let mut response = self.http.get(&url, AsyncBody::default(), true).await?;
-        let body = BufReader::new(response.body_mut());
-        let body = GzipDecoder::new(body);
-        let tar = Archive::new(body);
-
-        tar.unpack(&tar_out_dir)
-            .await
-            .context("failed to unpack wasi-sdk archive")?;
-
-        let inner_dir = fs::read_dir(&tar_out_dir)?
-            .next()
-            .ok_or_else(|| anyhow!("no content"))?
-            .context("failed to read contents of extracted wasi archive directory")?
-            .path();
-        fs::rename(&inner_dir, &wasi_sdk_dir).context("failed to move extracted wasi dir")?;
-        fs::remove_dir_all(&tar_out_dir).ok();
-
-        Ok(clang_path)
     }
 
     // This was adapted from:

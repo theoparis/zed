@@ -466,8 +466,8 @@ unindent = "0.1.7"
 unicode-segmentation = "1.10"
 url = "2.2"
 uuid = { version = "1.1.2", features = ["v4", "v5", "serde"] }
-wasmparser = "0.215"
-wasm-encoder = "0.215"
+wasmparser = "0.217"
+wasm-encoder = "0.217"
 wasmtime = { version = "24", default-features = false, features = [
     "async",
     "demangle",
@@ -597,3 +597,6 @@ should_implement_trait = { level = "allow" }
 
 [workspace.metadata.cargo-machete]
 ignored = ["bindgen", "cbindgen", "prost_build", "serde"]
+
+[patch.crates-io]
+pathfinder_simd = { git = "https://github.com/theoparis/pathfinder/" }
