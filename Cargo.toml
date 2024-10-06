@@ -599,4 +599,5 @@ should_implement_trait = { level = "allow" }
 ignored = ["bindgen", "cbindgen", "prost_build", "serde"]
 
 [patch.crates-io]
+zeromq = { git = "https://github.com/PaoloPana/zmq.rs" }
 pathfinder_simd = { git = "https://github.com/theoparis/pathfinder/" }
