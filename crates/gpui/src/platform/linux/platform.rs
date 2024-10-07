@@ -43,8 +43,6 @@ use crate::{
     Size, Task, WindowAppearance, WindowOptions, WindowParams,
 };
 
-use super::x11::X11Client;
-
 pub(crate) const SCROLL_LINES: f32 = 3.0;
 
 // Values match the defaults on GTK.

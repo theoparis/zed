@@ -76,7 +76,6 @@ pub(crate) fn current_platform(headless: bool) -> Rc<dyn Platform> {
 
     match guess_compositor() {
         "Wayland" => Rc::new(WaylandClient::new()),
-        "X11" => Rc::new(X11Client::new()),
         "Headless" => Rc::new(HeadlessClient::new()),
         _ => unreachable!(),
     }
@@ -91,15 +90,11 @@ pub fn guess_compositor() -> &'static str {
         return "Headless";
     }
     let wayland_display = std::env::var_os("WAYLAND_DISPLAY");
-    let x11_display = std::env::var_os("DISPLAY");
 
     let use_wayland = wayland_display.is_some_and(|display| !display.is_empty());
-    let use_x11 = x11_display.is_some_and(|display| !display.is_empty());
 
     if use_wayland {
         "Wayland"
-    } else if use_x11 {
-        "X11"
     } else {
         "Headless"
     }
