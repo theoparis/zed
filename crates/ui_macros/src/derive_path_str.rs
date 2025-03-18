@@ -1,7 +1,7 @@
 use convert_case::{Case, Casing};
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, Attribute, Data, DeriveInput, Lit, Meta, NestedMeta};
+use syn::{parse_macro_input, Attribute, Data, DeriveInput, Expr, ExprLit, Lit, Meta};
 
 pub fn derive_path_str(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
@@ -61,45 +61,53 @@ fn impl_path_str(
 }
 
 fn get_strum_serialize_all(attrs: &[Attribute]) -> Option<String> {
-    attrs
-        .iter()
-        .filter(|attr| attr.path.is_ident("strum"))
-        .find_map(|attr| {
-            if let Ok(Meta::List(meta_list)) = attr.parse_meta() {
-                meta_list.nested.iter().find_map(|nested_meta| {
-                    if let NestedMeta::Meta(Meta::NameValue(name_value)) = nested_meta {
-                        if name_value.path.is_ident("serialize_all") {
-                            if let Lit::Str(lit_str) = &name_value.lit {
-                                return Some(lit_str.value());
-                            }
-                        }
-                    }
-                    None
-                })
-            } else {
-                None
+    let mut found_value = None;
+
+    for attr in attrs.iter().filter(|attr| attr.path().is_ident("strum")) {
+        let _ = attr.parse_nested_meta(|meta| {
+            if meta.path.is_ident("serialize_all") {
+                if let Expr::Lit(ExprLit {
+                    lit: Lit::Str(lit_str),
+                    ..
+                }) = meta.value()?.parse()?
+                {
+                    found_value = Some(lit_str.value());
+                }
             }
-        })
+
+            Ok(())
+        });
+
+        if found_value.is_some() {
+            break;
+        }
+    }
+
+    found_value
 }
 
 fn get_attr_value(attrs: &[Attribute], key: &str) -> Option<String> {
-    attrs
-        .iter()
-        .filter(|attr| attr.path.is_ident("path_str"))
-        .find_map(|attr| {
-            if let Ok(Meta::List(meta_list)) = attr.parse_meta() {
-                meta_list.nested.iter().find_map(|nested_meta| {
-                    if let NestedMeta::Meta(Meta::NameValue(name_value)) = nested_meta {
-                        if name_value.path.is_ident(key) {
-                            if let Lit::Str(lit_str) = &name_value.lit {
-                                return Some(lit_str.value());
-                            }
-                        }
-                    }
-                    None
-                })
-            } else {
-                None
+    let mut found_value = None;
+
+    for attr in attrs.iter().filter(|attr| attr.path().is_ident("path_str")) {
+        let _ = attr.parse_nested_meta(|meta| {
+            if meta.path.is_ident(key) {
+                if let Expr::Lit(ExprLit {
+                    lit: Lit::Str(lit_str),
+                    ..
+                }) = meta.value()?.parse()?
+                {
+                    found_value = Some(lit_str.value());
+                }
             }
-        })
+
+            Ok(())
+        });
+
+        if found_value.is_some() {
+            break;
+        }
+    }
+
+    found_value
 }

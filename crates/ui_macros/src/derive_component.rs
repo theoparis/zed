@@ -1,7 +1,7 @@
 use convert_case::{Case, Casing};
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, DeriveInput, Lit, Meta, MetaList, MetaNameValue, NestedMeta};
+use syn::{parse_macro_input, DeriveInput, ExprLit, Lit};
 
 pub fn derive_into_component(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
@@ -9,24 +9,27 @@ pub fn derive_into_component(input: TokenStream) -> TokenStream {
     let mut description_val = None;
 
     for attr in &input.attrs {
-        if attr.path.is_ident("component") {
-            if let Ok(Meta::List(MetaList { nested, .. })) = attr.parse_meta() {
-                for item in nested {
-                    if let NestedMeta::Meta(Meta::NameValue(MetaNameValue {
-                        path,
-                        lit: Lit::Str(s),
-                        ..
-                    })) = item
-                    {
-                        let ident = path.get_ident().map(|i| i.to_string()).unwrap_or_default();
-                        if ident == "scope" {
-                            scope_val = Some(s.value());
-                        } else if ident == "description" {
-                            description_val = Some(s.value());
-                        }
+        if attr.path().is_ident("component") {
+            attr.parse_nested_meta(|item| {
+                if let ExprLit {
+                    lit: Lit::Str(s), ..
+                } = item.value()?.parse()?
+                {
+                    let ident = item
+                        .path
+                        .get_ident()
+                        .map(|i| i.to_string())
+                        .unwrap_or_default();
+                    if ident == "scope" {
+                        scope_val = Some(s.value());
+                    } else if ident == "description" {
+                        description_val = Some(s.value());
                     }
                 }
-            }
+
+                Ok(())
+            })
+            .unwrap();
         }
     }
 

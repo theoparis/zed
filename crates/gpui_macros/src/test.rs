@@ -3,72 +3,94 @@ use proc_macro2::Ident;
 use quote::{format_ident, quote};
 use std::mem;
 use syn::{
-    parse_quote, spanned::Spanned, AttributeArgs, FnArg, ItemFn, Lit, Meta, MetaList, NestedMeta,
-    PathSegment, Type,
+    parse_quote, spanned::Spanned, Error, Expr, ExprLit, FnArg, ItemFn, Lit, Meta, MetaList,
+    MetaNameValue, PathSegment, Type,
 };
 
 pub fn test(args: TokenStream, function: TokenStream) -> TokenStream {
-    let args = syn::parse_macro_input!(args as AttributeArgs);
-    try_test(args, function).unwrap_or_else(|err| err)
-}
-
-fn try_test(args: Vec<NestedMeta>, function: TokenStream) -> Result<TokenStream, TokenStream> {
     let mut seeds = Vec::<u64>::new();
     let mut max_retries = 0;
     let mut num_iterations = 1;
     let mut on_failure_fn_name = quote!(None);
 
-    for arg in args {
-        let NestedMeta::Meta(arg) = arg else {
-            return Err(error_with_message("unexpected literal", arg));
-        };
-
-        let ident = {
-            let meta_path = match &arg {
-                Meta::NameValue(meta) => &meta.path,
-                Meta::List(list) => &list.path,
-                Meta::Path(path) => return Err(error_with_message("invalid path argument", path)),
-            };
-            let Some(ident) = meta_path.get_ident() else {
-                return Err(error_with_message("unexpected path", meta_path));
-            };
-            ident.to_string()
-        };
-
-        match (&arg, ident.as_str()) {
-            (Meta::NameValue(meta), "retries") => max_retries = parse_usize(&meta.lit)?,
-            (Meta::NameValue(meta), "iterations") => num_iterations = parse_usize(&meta.lit)?,
-            (Meta::NameValue(meta), "on_failure") => {
-                let Lit::Str(name) = &meta.lit else {
-                    return Err(error_with_message(
-                        "on_failure argument must be a string",
-                        &meta.lit,
-                    ));
+    let args_parser = syn::meta::parser(|arg| {
+        arg.parse_nested_meta(|meta| {
+            let ident = {
+                let Some(ident) = meta.path.get_ident() else {
+                    return Err(Error::new(meta.path.span(), "unexpected path"));
                 };
-                let segments = name
-                    .value()
-                    .split("::")
-                    .map(|part| PathSegment::from(Ident::new(part, name.span())))
-                    .collect();
-                let path = syn::Path {
-                    leading_colon: None,
-                    segments,
-                };
-                on_failure_fn_name = quote!(Some(#path));
+
+                ident.to_string()
+            };
+
+            match (meta.value()?.parse()?, ident.as_str()) {
+                (
+                    Meta::NameValue(MetaNameValue {
+                        value: Expr::Lit(ExprLit { lit, .. }),
+                        ..
+                    }),
+                    "retries",
+                ) => max_retries = parse_usize(&lit).unwrap(),
+                (
+                    Meta::NameValue(MetaNameValue {
+                        value: Expr::Lit(ExprLit { lit, .. }),
+                        ..
+                    }),
+                    "iterations",
+                ) => num_iterations = parse_usize(&lit).unwrap(),
+                (Meta::NameValue(meta), "on_failure") => {
+                    let Expr::Lit(ExprLit {
+                        lit: Lit::Str(name),
+                        ..
+                    }) = &meta.value
+                    else {
+                        return Err(Error::new(
+                            meta.value.span(),
+                            "on_failure argument must be a string",
+                        ));
+                    };
+                    let segments = name
+                        .value()
+                        .split("::")
+                        .map(|part| PathSegment::from(Ident::new(part, name.span())))
+                        .collect();
+                    let path = syn::Path {
+                        leading_colon: None,
+                        segments,
+                    };
+                    on_failure_fn_name = quote!(Some(#path));
+                }
+                (
+                    Meta::NameValue(MetaNameValue {
+                        value: Expr::Lit(ExprLit { lit, .. }),
+                        ..
+                    }),
+                    "seed",
+                ) => {
+                    seeds = vec![parse_usize(&lit)? as u64];
+                }
+                (Meta::List(list), "seeds") => seeds = parse_u64_array(&list)?,
+                (Meta::Path(path), _) => {
+                    return Err(Error::new(path.span(), "invalid path argument"));
+                }
+                (value, _) => {
+                    return Err(Error::new(value.span(), "invalid argument name"));
+                }
             }
-            (Meta::NameValue(meta), "seed") => seeds = vec![parse_usize(&meta.lit)? as u64],
-            (Meta::List(list), "seeds") => seeds = parse_u64_array(&list)?,
-            (Meta::Path(path), _) => {
-                return Err(error_with_message("invalid path argument", path));
-            }
-            (_, _) => {
-                return Err(error_with_message("invalid argument name", arg));
-            }
-        }
-    }
+
+            Ok(())
+        })
+    });
+
+    syn::parse_macro_input!(args with args_parser);
     let seeds = quote!( #(#seeds),* );
 
-    let mut inner_fn = syn::parse::<ItemFn>(function).map_err(error_to_stream)?;
+    let mut inner_fn = match syn::parse::<ItemFn>(function) {
+        Ok(inner_fn) => inner_fn,
+        Err(err) => {
+            return error_to_stream(err);
+        }
+    };
     let inner_fn_attributes = mem::take(&mut inner_fn.attrs);
     let inner_fn_name = format_ident!("_{}", inner_fn.sig.ident);
     let outer_fn_name = mem::replace(&mut inner_fn.sig.ident, inner_fn_name.clone());
@@ -121,7 +143,7 @@ fn try_test(args: Vec<NestedMeta>, function: TokenStream) -> Result<TokenStream,
                 }
             }
 
-            return Err(error_with_message("invalid function signature", arg));
+            return error_to_stream(Error::new(arg.span(), "invalid function signature"));
         }
 
         parse_quote! {
@@ -203,7 +225,7 @@ fn try_test(args: Vec<NestedMeta>, function: TokenStream) -> Result<TokenStream,
                 }
             }
 
-            return Err(error_with_message("invalid function signature", arg));
+            return error_to_stream(Error::new(arg.span(), "invalid function signature"));
         }
 
         parse_quote! {
@@ -227,32 +249,36 @@ fn try_test(args: Vec<NestedMeta>, function: TokenStream) -> Result<TokenStream,
     };
     outer_fn.attrs.extend(inner_fn_attributes);
 
-    Ok(TokenStream::from(quote!(#outer_fn)))
+    TokenStream::from(quote!(#outer_fn))
 }
 
-fn parse_usize(literal: &Lit) -> Result<usize, TokenStream> {
+fn parse_usize(literal: &Lit) -> Result<usize, Error> {
     let Lit::Int(int) = &literal else {
-        return Err(error_with_message("expected an usize", literal));
+        return Err(Error::new(literal.span(), "expected an usize"));
     };
-    int.base10_parse().map_err(error_to_stream)
+
+    int.base10_parse()
 }
 
-fn parse_u64_array(meta_list: &MetaList) -> Result<Vec<u64>, TokenStream> {
-    meta_list
-        .nested
-        .iter()
-        .map(|meta| {
-            if let NestedMeta::Lit(literal) = &meta {
-                parse_usize(literal).map(|value| value as u64)
-            } else {
-                Err(error_with_message("expected an integer", meta.span()))
-            }
-        })
-        .collect()
-}
+fn parse_u64_array(meta_list: &MetaList) -> Result<Vec<u64>, Error> {
+    let mut array = vec![];
 
-fn error_with_message(message: &str, spanned: impl Spanned) -> TokenStream {
-    error_to_stream(syn::Error::new(spanned.span(), message))
+    meta_list.parse_nested_meta(|meta| {
+        let meta = meta.value()?.parse()?;
+
+        if let Meta::NameValue(MetaNameValue {
+            value: Expr::Lit(ExprLit { lit, .. }),
+            ..
+        }) = meta
+        {
+            array.push(parse_usize(&lit).map(|value| value as u64)?);
+            return Ok(());
+        }
+
+        Err(Error::new(meta.span(), "expected an integer"))
+    })?;
+
+    Ok(array)
 }
 
 fn error_to_stream(err: syn::Error) -> TokenStream {

@@ -1,6 +1,6 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, Attribute, Data, DeriveInput, Lit, Meta, NestedMeta};
+use syn::{parse_macro_input, Attribute, Data, DeriveInput, Expr, ExprLit, Lit};
 
 pub fn derive_path_static_str(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
@@ -51,23 +51,29 @@ fn impl_path_str(
 }
 
 fn get_attr_value(attrs: &[Attribute], key: &str) -> Option<String> {
-    attrs
+    let mut found_value = None;
+
+    for attr in attrs
         .iter()
-        .filter(|attr| attr.path.is_ident("derive_path_static_str"))
-        .find_map(|attr| {
-            if let Ok(Meta::List(meta_list)) = attr.parse_meta() {
-                meta_list.nested.iter().find_map(|nested_meta| {
-                    if let NestedMeta::Meta(Meta::NameValue(name_value)) = nested_meta {
-                        if name_value.path.is_ident(key) {
-                            if let Lit::Str(lit_str) = &name_value.lit {
-                                return Some(lit_str.value());
-                            }
-                        }
-                    }
-                    None
-                })
-            } else {
-                None
+        .filter(|attr| attr.path().is_ident("derive_path_static_str"))
+    {
+        let _ = attr.parse_nested_meta(|meta| {
+            if meta.path.is_ident(key) {
+                if let Expr::Lit(ExprLit {
+                    lit: Lit::Str(lit_str),
+                    ..
+                }) = meta.value()?.parse()?
+                {
+                    found_value = Some(lit_str.value());
+                }
             }
-        })
+            Ok(())
+        });
+
+        if found_value.is_some() {
+            break;
+        }
+    }
+
+    found_value
 }

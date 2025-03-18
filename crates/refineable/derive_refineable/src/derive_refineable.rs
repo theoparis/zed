@@ -2,8 +2,8 @@ use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{format_ident, quote};
 use syn::{
-    parse_macro_input, parse_quote, DeriveInput, Field, FieldsNamed, PredicateType, TraitBound,
-    Type, TypeParamBound, WhereClause, WherePredicate,
+    parse_macro_input, parse_quote, DeriveInput, Field, FieldsNamed, Meta, PredicateType,
+    TraitBound, Type, TypeParamBound, WhereClause, WherePredicate,
 };
 
 #[proc_macro_derive(Refineable, attributes(refineable))]
@@ -16,22 +16,25 @@ pub fn derive_refineable(input: TokenStream) -> TokenStream {
         ..
     } = parse_macro_input!(input);
 
-    let refineable_attr = attrs.iter().find(|attr| attr.path.is_ident("refineable"));
+    let refineable_attr = attrs.iter().find(|attr| attr.path().is_ident("refineable"));
 
     let mut impl_debug_on_refinement = false;
     let mut refinement_traits_to_derive = vec![];
 
     if let Some(refineable_attr) = refineable_attr {
-        if let Ok(syn::Meta::List(meta_list)) = refineable_attr.parse_meta() {
-            for nested in meta_list.nested {
-                let syn::NestedMeta::Meta(syn::Meta::Path(path)) = nested else {
-                    continue;
-                };
-
-                if path.is_ident("Debug") {
-                    impl_debug_on_refinement = true;
-                } else {
-                    refinement_traits_to_derive.push(path);
+        if let Ok(meta_list) = refineable_attr
+            .parse_args_with(syn::punctuated::Punctuated::<Meta, syn::Token![,]>::parse_terminated)
+        {
+            for nested in meta_list {
+                match nested {
+                    Meta::Path(path) => {
+                        if path.is_ident("Debug") {
+                            impl_debug_on_refinement = true;
+                        } else {
+                            refinement_traits_to_derive.push(path);
+                        }
+                    }
+                    _ => {}
                 }
             }
         }
@@ -325,7 +328,9 @@ pub fn derive_refineable(input: TokenStream) -> TokenStream {
 }
 
 fn is_refineable_field(f: &Field) -> bool {
-    f.attrs.iter().any(|attr| attr.path.is_ident("refineable"))
+    f.attrs
+        .iter()
+        .any(|attr| attr.path().is_ident("refineable"))
 }
 
 fn is_optional_field(f: &Field) -> bool {
