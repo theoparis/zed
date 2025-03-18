@@ -57,7 +57,7 @@ util.workspace = true
 workspace.workspace = true
 
 [target.'cfg(windows)'.dependencies]
-async-std = { version = "1.12.0", features = ["unstable"] }
+async-std = { version = "1.13.1", features = ["unstable"] }
 
 [dev-dependencies]
 client = { workspace = true, features = ["test-support"] }

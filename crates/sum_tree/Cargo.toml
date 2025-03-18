@@ -13,7 +13,7 @@ path = "src/sum_tree.rs"
 doctest = false
 
 [dependencies]
-arrayvec = "0.7.1"
+arrayvec = "0.7.6"
 rayon.workspace = true
 log.workspace = true
 

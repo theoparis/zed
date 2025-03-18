@@ -38,8 +38,8 @@ fork.workspace = true
 
 [target.'cfg(target_os = "macos")'.dependencies]
 core-foundation.workspace = true
-core-services = "0.2"
-plist = "1.3"
+core-services = "1.0"
+plist = "1.7"
 
 [target.'cfg(target_os = "windows")'.dependencies]
 windows.workspace = true

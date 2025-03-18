@@ -22,11 +22,11 @@ anthropic.workspace = true
 anyhow.workspace = true
 async-stripe.workspace = true
 async-tungstenite.workspace = true
-aws-config = { version = "1.1.5" }
-aws-sdk-s3 = { version = "1.15.0" }
-aws-sdk-kinesis = "1.51.0"
-axum = { version = "0.6", features = ["json", "headers", "ws"] }
-axum-extra = { version = "0.4", features = ["erased-json"] }
+aws-config = { version = "1.6.0" }
+aws-sdk-s3 = { version = "1.79.0" }
+aws-sdk-kinesis = "1.64.0"
+axum = { version = "0.8.1", features = ["json", "ws"] }
+axum-extra = { version = "0.10", features = ["erased-json"] }
 base64.workspace = true
 chrono.workspace = true
 clock.workspace = true
@@ -48,12 +48,12 @@ parking_lot.workspace = true
 prometheus = "0.13"
 prost.workspace = true
 rand.workspace = true
-reqwest = { version = "0.11", features = ["json"] }
+reqwest = { version = "0.12", features = ["json"] }
 reqwest_client.workspace = true
 rpc.workspace = true
 rustc-demangle.workspace = true
 scrypt = "0.11"
-sea-orm = { version = "1.1.0-rc.1", features = ["sqlx-postgres", "postgres-array", "runtime-tokio-rustls", "with-uuid"] }
+sea-orm = { version = "1.1.7", features = ["sqlx-postgres", "postgres-array", "runtime-tokio-rustls", "with-uuid"] }
 semantic_version.workspace = true
 semver.workspace = true
 serde.workspace = true
@@ -70,10 +70,10 @@ thiserror.workspace = true
 time.workspace = true
 tokio = { workspace = true, features = ["full"] }
 toml.workspace = true
-tower = "0.4"
+tower = "0.5"
 tower-http = { workspace = true, features = ["trace"] }
-tracing = "0.1.40"
-tracing-subscriber = { version = "0.3.18", features = ["env-filter", "json", "registry", "tracing-log"] } # workaround for https://github.com/tokio-rs/tracing/issues/2927
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["env-filter", "json", "registry", "tracing-log"] } # workaround for https://github.com/tokio-rs/tracing/issues/2927
 util.workspace = true
 uuid.workspace = true
 
@@ -120,7 +120,7 @@ release_channel.workspace = true
 remote = { workspace = true, features = ["test-support"] }
 remote_server.workspace = true
 rpc = { workspace = true, features = ["test-support"] }
-sea-orm = { version = "1.1.0-rc.1", features = ["sqlx-sqlite"] }
+sea-orm = { version = "1.1.7", features = ["sqlx-sqlite"] }
 serde_json.workspace = true
 session = { workspace = true, features = ["test-support"] }
 settings = { workspace = true, features = ["test-support"] }

@@ -61,7 +61,7 @@ theme.workspace = true
 tree-sitter-rust = { workspace = true, optional = true }
 tree-sitter-typescript = { workspace = true, optional = true }
 tree-sitter.workspace = true
-unicase = "2.6"
+unicase = "2.8"
 util.workspace = true
 
 [dev-dependencies]

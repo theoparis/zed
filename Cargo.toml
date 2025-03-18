@@ -380,94 +380,94 @@ zeta = { path = "crates/zeta" }
 aho-corasick = "1.1"
 alacritty_terminal = { git = "https://github.com/zed-industries/alacritty.git", branch = "add-hush-login-flag" }
 any_vec = "0.14"
-anyhow = "1.0.86"
-arrayvec = { version = "0.7.4", features = ["serde"] }
+anyhow = "1.0.97"
+arrayvec = { version = "0.7.6", features = ["serde"] }
 ashpd = { version = "0.11", default-features = false, features = ["async-std"] }
-async-compat = "0.2.1"
+async-compat = "0.2.4"
 async-compression = { version = "0.4", features = ["gzip", "futures-io"] }
 async-dispatcher = "0.1"
 async-fs = "2.1"
 async-pipe = { git = "https://github.com/zed-industries/async-pipe-rs", rev = "82d00a04211cf4e1236029aa03e6b6ce2a74c553" }
-async-recursion = "1.0.0"
+async-recursion = "1.1.1"
 async-tar = "0.5.0"
 async-trait = "0.1"
-async-tungstenite = "0.28"
+async-tungstenite = "0.29"
 async-watch = "0.3.1"
 async_zip = { version = "0.0.17", features = ["deflate", "deflate64"] }
-aws-config = { version = "1.5.16", features = ["behavior-version-latest"] }
-aws-credential-types = { version = "1.2.1", features = ["hardcoded-credentials"] }
-aws-sdk-bedrockruntime = { version = "1.73.0", features = ["behavior-version-latest"] }
-aws-smithy-runtime-api = { version = "1.7.3", features = ["http-1x", "client"] }
-aws-smithy-types = { version = "1.2.13", features = ["http-body-1-x"] }
+aws-config = { version = "1.6.0", features = ["behavior-version-latest"] }
+aws-credential-types = { version = "1.2.2", features = ["hardcoded-credentials"] }
+aws-sdk-bedrockruntime = { version = "1.77.0", features = ["behavior-version-latest"] }
+aws-smithy-runtime-api = { version = "1.7.4", features = ["http-1x", "client"] }
+aws-smithy-types = { version = "1.3.0", features = ["http-body-1-x"] }
 base64 = "0.22"
-bitflags = "2.6.0"
+bitflags = "2.9.0"
 blade-graphics = { git = "https://github.com/kvark/blade", rev = "b16f5c7bd873c7126f48c82c39e7ae64602ae74f" }
 blade-macros = { git = "https://github.com/kvark/blade", rev = "b16f5c7bd873c7126f48c82c39e7ae64602ae74f" }
 blade-util = { git = "https://github.com/kvark/blade", rev = "b16f5c7bd873c7126f48c82c39e7ae64602ae74f" }
-naga = { version = "23.1.0", features = ["wgsl-in"] }
-blake3 = "1.5.3"
-bytes = "1.0"
+naga = { version = "24.0.0", features = ["wgsl-in"] }
+blake3 = "1.7.0"
+bytes = "1.10"
 cargo_metadata = "0.19"
-cargo_toml = "0.21"
+cargo_toml = "0.22"
 chrono = { version = "0.4", features = ["serde"] }
-circular-buffer = "1.0"
-clap = { version = "4.4", features = ["derive"] }
+circular-buffer = "1.1"
+clap = { version = "4.5", features = ["derive"] }
 cocoa = "0.26"
 cocoa-foundation = "0.2.0"
 convert_case = "0.8.0"
-core-foundation = "0.9.3"
-core-foundation-sys = "0.8.6"
-ctor = "0.4.0"
-dashmap = "6.0"
+core-foundation = "0.10.0"
+core-foundation-sys = "0.8.7"
+ctor = "0.4.1"
+dashmap = "6.1"
 dap-types = { git = "https://github.com/zed-industries/dap-types", rev = "bfd4af0" }
-derive_more = "0.99.17"
-dirs = "4.0"
+derive_more = { version = "2.0.1", features = ["full"] }
+dirs = "6.0"
 ec4rs = "1.1"
-emojis = "0.6.1"
+emojis = "0.6.4"
 env_logger = "0.11"
 exec = "0.3.1"
 fancy-regex = "0.14.0"
 fork = "0.2.0"
 futures = "0.3"
 futures-batch = "0.6.1"
-futures-lite = "1.13"
+futures-lite = "2.6"
 git2 = { version = "0.20.1", default-features = false }
 globset = "0.4"
-handlebars = "4.3"
-heed = { version = "0.21.0", features = ["read-txn-no-tls"] }
+handlebars = "6.3"
+heed = { version = "0.22.0" }
 hex = "0.4.3"
-html5ever = "0.27.0"
-hyper = "0.14"
-http = "1.1"
-ignore = "0.4.22"
-image = "0.25.1"
+html5ever = "0.30.0"
+hyper = "1.6"
+http = "1.3"
+ignore = "0.4.23"
+image = "0.25.5"
 imara-diff = "0.1.8"
-indexmap = { version = "2.7.0", features = ["serde"] }
+indexmap = { version = "2.8.0", features = ["serde"] }
 indoc = "2"
-inventory = "0.3.19"
+inventory = "0.3.20"
 itertools = "0.14.0"
 jsonwebtoken = "9.3"
 jupyter-protocol = { version = "0.6.0" }
 jupyter-websocket-client = { version = "0.9.0" }
 libc = "0.2"
-libsqlite3-sys = { version = "0.30.1", features = ["bundled"] }
+libsqlite3-sys = { version = "=0.30.1" }
 linkify = "0.10.0"
-linkme = "0.3.31"
+linkme = "0.3.32"
 livekit = { git = "https://github.com/zed-industries/livekit-rust-sdks", rev = "811ceae29fabee455f110c56cd66b3f49a7e5003", features = [
     "dispatcher",
     "services-dispatcher",
     "rustls-tls-native-roots",
 ], default-features = false }
-log = { version = "0.4.16", features = ["kv_unstable_serde", "serde"] }
+log = { version = "0.4.26", features = ["kv_unstable_serde", "serde"] }
 markup5ever_rcdom = "0.3.0"
 mlua = { version = "0.10", features = ["lua54", "vendored", "async", "send"] }
 nanoid = "0.4"
 nbformat = { version = "0.10.0" }
 nix = "0.29"
 num-format = "0.4.4"
-ordered-float = "2.1.1"
-palette = { version = "0.7.5", default-features = false, features = ["std"] }
-parking_lot = "0.12.1"
+ordered-float = "5.0.0"
+palette = { version = "0.7.6", default-features = false, features = ["std"] }
+parking_lot = "0.12.3"
 pathdiff = "0.2"
 pet = { git = "https://github.com/microsoft/python-environment-tools.git", rev = "1abe5cec5ebfbe97ca71746a4cfc7fe89bddf8e0" }
 pet-fs = { git = "https://github.com/microsoft/python-environment-tools.git", rev = "1abe5cec5ebfbe97ca71746a4cfc7fe89bddf8e0" }
@@ -477,17 +477,17 @@ pet-core = { git = "https://github.com/microsoft/python-environment-tools.git", 
 pet-poetry = { git = "https://github.com/microsoft/python-environment-tools.git", rev = "1abe5cec5ebfbe97ca71746a4cfc7fe89bddf8e0" }
 pet-reporter = { git = "https://github.com/microsoft/python-environment-tools.git", rev = "1abe5cec5ebfbe97ca71746a4cfc7fe89bddf8e0" }
 postage = { version = "0.5", features = ["futures-traits"] }
-pretty_assertions = { version = "1.3.0", features = ["unstable"] }
-proc-macro2 = "1.0.93"
+pretty_assertions = { version = "1.4.1", features = ["unstable"] }
+proc-macro2 = "1.0.94"
 profiling = "1"
-prost = "0.9"
-prost-build = "0.9"
-prost-types = "0.9"
-pulldown-cmark = { version = "0.12.0", default-features = false }
-quote = "1.0.9"
-rand = "0.8.5"
-rayon = "1.8"
-regex = "1.5"
+prost = "0.13"
+prost-build = "0.13"
+prost-types = "0.13"
+pulldown-cmark = { version = "0.13.0", default-features = false }
+quote = "1.0.40"
+rand = "0.9.0"
+rayon = "1.10"
+regex = "1.11"
 repair_json = "0.1.0"
 reqwest = { git = "https://github.com/zed-industries/reqwest.git", rev = "fd110f6998da16bbca97b6dddda9be7827c50e29", default-features = false, features = [
     "charset",
@@ -497,15 +497,15 @@ reqwest = { git = "https://github.com/zed-industries/reqwest.git", rev = "fd110f
     "socks",
     "stream",
 ] }
-rsa = "0.9.6"
+rsa = "0.9.8"
 runtimelib = { version = "0.25.0", default-features = false, features = [
     "async-dispatcher-runtime",
 ] }
-rustc-demangle = "0.1.23"
-rust-embed = { version = "8.4", features = ["include-exclude"] }
-rustc-hash = "2.1.0"
-rustls = { version = "0.23.22" }
-rustls-platform-verifier = "0.5.0"
+rustc-demangle = "0.1.24"
+rust-embed = { version = "8.6", features = ["include-exclude"] }
+rustc-hash = "2.1.1"
+rustls = { version = "0.23.25" }
+rustls-platform-verifier = "0.5.1"
 schemars = { version = "0.8", features = ["impl_json_schema", "indexmap2"] }
 semver = "1.0"
 serde = { version = "1.0", features = ["derive", "rc"] }
@@ -517,23 +517,23 @@ serde_json_lenient = { version = "0.2", features = [
 ] }
 serde_repr = "0.1"
 sha2 = "0.10"
-shellexpand = "2.1.0"
+shellexpand = "3.1.0"
 shlex = "1.3.0"
 signal-hook = "0.3.17"
 simplelog = "0.12.2"
-smallvec = { version = "1.6", features = ["union"] }
+smallvec = { version = "1.14", features = ["union"] }
 smol = "2.0"
-sqlformat = "0.2"
+sqlformat = "0.3"
 streaming-iterator = "0.1"
 strsim = "0.11"
-strum = { version = "0.26.0", features = ["derive"] }
-subtle = "2.5.0"
-syn = { version = "1.0.72", features = ["full", "extra-traits"] }
-sys-locale = "0.3.1"
-sysinfo = "0.31.0"
+strum = { version = "0.27.1", features = ["derive"] }
+subtle = "2.6.1"
+syn = { version = "2.0.100", features = ["full", "extra-traits"] }
+sys-locale = "0.3.2"
+sysinfo = "0.33.1"
 take-until = "0.2.0"
-tempfile = "3.9.0"
-thiserror = "1.0.29"
+tempfile = "3.19.0"
+thiserror = "2.0.12"
 tiktoken-rs = "0.6.0"
 time = { version = "0.3", features = [
     "macros",
@@ -542,17 +542,17 @@ time = { version = "0.3", features = [
     "serde-well-known",
     "formatting",
 ] }
-tiny_http = "0.8"
+tiny_http = "0.12"
 toml = "0.8"
 tokio = { version = "1" }
-tower-http = "0.4.4"
+tower-http = "0.6.2"
 tree-sitter = { version = "0.25.3", features = ["wasm"] }
 tree-sitter-bash = "0.23"
 tree-sitter-c = "0.23"
 tree-sitter-cpp = "0.23"
 tree-sitter-css = "0.23"
 tree-sitter-elixir = "0.3"
-tree-sitter-embedded-template = "0.23.0"
+tree-sitter-embedded-template = "0.23.2"
 tree-sitter-gitcommit = { git = "https://github.com/zed-industries/tree-sitter-git-commit", rev = "88309716a69dd13ab83443721ba6e0b491d37ee9" }
 tree-sitter-go = "0.23"
 tree-sitter-go-mod = { git = "https://github.com/camdencheek/tree-sitter-go-mod", rev = "6efb59652d30e0e9cd5f3b3a669afd6f1a926d3c", package = "tree-sitter-gomod" }
@@ -569,27 +569,27 @@ tree-sitter-ruby = "0.23"
 tree-sitter-rust = "0.23"
 tree-sitter-typescript = "0.23"
 tree-sitter-yaml = { git = "https://github.com/zed-industries/tree-sitter-yaml", rev = "baff0b51c64ef6a1fb1f8390f3ad6015b83ec13a" }
-unicase = "2.6"
-unindent = "0.2.0"
-unicode-segmentation = "1.10"
+unicase = "2.8"
+unindent = "0.2.4"
+unicode-segmentation = "1.12"
 unicode-script = "0.5.7"
-url = "2.2"
-urlencoding = "2.1.2"
-uuid = { version = "1.1.2", features = ["v4", "v5", "v7", "serde"] }
-wasmparser = "0.221"
-wasm-encoder = "0.221"
-wasmtime = { version = "29", default-features = false, features = [
+url = "2.5"
+urlencoding = "2.1.3"
+uuid = { version = "1.16.0", features = ["v4", "v5", "v7", "serde"] }
+wasmparser = "0.227"
+wasm-encoder = "0.227"
+wasmtime = { version = "30", default-features = false, features = [
     "async",
     "demangle",
     "runtime",
     "cranelift",
     "component-model",
 ] }
-wasmtime-wasi = "29"
-which = "6.0.0"
-wit-component = "0.221"
+wasmtime-wasi = "30"
+which = "7.0.2"
+wit-component = "0.227"
 zed_llm_client = "0.4"
-zstd = "0.11"
+zstd = "0.13"
 metal = "0.31"
 
 [workspace.dependencies.async-stripe]
@@ -607,7 +607,7 @@ features = [
 ]
 
 [workspace.dependencies.windows]
-version = "0.60"
+version = "0.61.1"
 features = [
     "Foundation_Collections",
     "Foundation_Numerics",

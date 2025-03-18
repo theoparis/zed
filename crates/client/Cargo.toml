@@ -17,7 +17,7 @@ test-support = ["clock/test-support", "collections/test-support", "gpui/test-sup
 
 [dependencies]
 anyhow.workspace = true
-async-recursion = "0.3"
+async-recursion = "1.1"
 async-tungstenite = { workspace = true, features = ["async-std", "async-tls"] }
 chrono = { workspace = true, features = ["serde"] }
 clock.workspace = true
@@ -45,7 +45,7 @@ telemetry_events.workspace = true
 text.workspace = true
 thiserror.workspace = true
 time.workspace = true
-tiny_http = "0.8"
+tiny_http = "0.12"
 tokio-socks = { version = "0.5.2", default-features = false, features = ["futures-io"] }
 url.workspace = true
 util.workspace = true
