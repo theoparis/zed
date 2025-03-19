@@ -55,15 +55,18 @@ impl Connection {
                 .exec_bound("INSERT INTO migrations (domain, step, migration) VALUES (?, ?, ?)")?;
 
             for (index, migration) in migrations.iter().enumerate() {
-                let migration =
-                    sqlformat::format(migration, &sqlformat::QueryParams::None, Default::default());
+                let migration = sqlformat::format(
+                    migration,
+                    &sqlformat::QueryParams::None,
+                    &Default::default(),
+                );
                 if let Some((_, _, completed_migration)) = completed_migrations.get(index) {
                     // Reformat completed migrations with the current `sqlformat` version, so that past migrations stored
                     // conform to the new formatting rules.
                     let completed_migration = sqlformat::format(
                         completed_migration,
                         &sqlformat::QueryParams::None,
-                        Default::default(),
+                        &Default::default(),
                     );
                     if completed_migration == migration {
                         // Migration already run. Continue

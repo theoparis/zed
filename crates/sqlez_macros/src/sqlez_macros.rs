@@ -22,7 +22,7 @@ pub fn sql(tokens: TokenStream) -> TokenStream {
     #[cfg(any(target_os = "linux", target_os = "freebsd"))]
     let error: Option<(String, usize)> = None;
 
-    let formatted_sql = sqlformat::format(&sql, &sqlformat::QueryParams::None, Default::default());
+    let formatted_sql = sqlformat::format(&sql, &sqlformat::QueryParams::None, &Default::default());
 
     if let Some((error, error_offset)) = error {
         create_error(spans, error_offset, error, &formatted_sql)
