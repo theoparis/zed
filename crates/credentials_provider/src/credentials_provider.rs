@@ -92,7 +92,7 @@ impl CredentialsProvider for KeychainCredentialsProvider {
         url: &'a str,
         cx: &'a AsyncApp,
     ) -> Pin<Box<dyn Future<Output = Result<Option<(String, Vec<u8>)>>> + 'a>> {
-        async move { cx.update(|cx| cx.read_credentials(url))?.await }.boxed_local()
+        async move { Ok(None) }.boxed_local()
     }
 
     fn write_credentials<'a>(
@@ -102,11 +102,12 @@ impl CredentialsProvider for KeychainCredentialsProvider {
         password: &'a [u8],
         cx: &'a AsyncApp,
     ) -> Pin<Box<dyn Future<Output = Result<()>> + 'a>> {
-        async move {
-            cx.update(move |cx| cx.write_credentials(url, username, password))?
-                .await
-        }
-        .boxed_local()
+        async move { Ok(()) }.boxed_local()
+        // async move {
+        //     cx.update(move |cx| cx.write_credentials(url, username, password))?
+        //         .await
+        // }
+        // .boxed_local()
     }
 
     fn delete_credentials<'a>(
@@ -114,7 +115,7 @@ impl CredentialsProvider for KeychainCredentialsProvider {
         url: &'a str,
         cx: &'a AsyncApp,
     ) -> Pin<Box<dyn Future<Output = Result<()>> + 'a>> {
-        async move { cx.update(move |cx| cx.delete_credentials(url))?.await }.boxed_local()
+        async move { Ok(()) }.boxed_local()
     }
 }
 

@@ -107,8 +107,6 @@ impl PeerId {
     }
 }
 
-impl Copy for PeerId {}
-
 impl Eq for PeerId {}
 
 impl Ord for PeerId {

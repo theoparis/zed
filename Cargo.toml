@@ -17,8 +17,6 @@ members = [
     "crates/audio",
     "crates/auto_update",
     "crates/auto_update_ui",
-    "crates/aws_http_client",
-    "crates/bedrock",
     "crates/breadcrumbs",
     "crates/buffer_diff",
     "crates/call",
@@ -26,8 +24,8 @@ members = [
     "crates/cli",
     "crates/client",
     "crates/clock",
-    "crates/collab",
-    "crates/collab_ui",
+    # "crates/collab",
+    # "crates/collab_ui",
     "crates/collections",
     "crates/command_palette",
     "crates/command_palette_hooks",
@@ -84,9 +82,6 @@ members = [
     "crates/language_selector",
     "crates/language_tools",
     "crates/languages",
-    "crates/livekit_api",
-    "crates/livekit_client",
-    "crates/livekit_client_macos",
     "crates/lmstudio",
     "crates/lsp",
     "crates/markdown",
@@ -221,8 +216,6 @@ assistant_tools = { path = "crates/assistant_tools" }
 audio = { path = "crates/audio" }
 auto_update = { path = "crates/auto_update" }
 auto_update_ui = { path = "crates/auto_update_ui" }
-aws_http_client = { path = "crates/aws_http_client" }
-bedrock = { path = "crates/bedrock" }
 breadcrumbs = { path = "crates/breadcrumbs" }
 call = { path = "crates/call" }
 channel = { path = "crates/channel" }
@@ -286,9 +279,6 @@ language_models = { path = "crates/language_models" }
 language_selector = { path = "crates/language_selector" }
 language_tools = { path = "crates/language_tools" }
 languages = { path = "crates/languages" }
-livekit_api = { path = "crates/livekit_api" }
-livekit_client = { path = "crates/livekit_client" }
-livekit_client_macos = { path = "crates/livekit_client_macos" }
 lmstudio = { path = "crates/lmstudio" }
 lsp = { path = "crates/lsp" }
 markdown = { path = "crates/markdown" }
@@ -377,6 +367,7 @@ zeta = { path = "crates/zeta" }
 # External crates
 #
 
+keyring = { git = "https://github.com/hwchen/keyring-rs" }
 aho-corasick = "1.1"
 alacritty_terminal = { git = "https://github.com/zed-industries/alacritty.git", branch = "add-hush-login-flag" }
 any_vec = "0.14"
@@ -394,11 +385,6 @@ async-trait = "0.1"
 async-tungstenite = "0.29"
 async-watch = "0.3.1"
 async_zip = { version = "0.0.17", features = ["deflate", "deflate64"] }
-aws-config = { version = "1.6.0", features = ["behavior-version-latest"] }
-aws-credential-types = { version = "1.2.2", features = ["hardcoded-credentials"] }
-aws-sdk-bedrockruntime = { version = "1.77.0", features = ["behavior-version-latest"] }
-aws-smithy-runtime-api = { version = "1.7.4", features = ["http-1x", "client"] }
-aws-smithy-types = { version = "1.3.0", features = ["http-body-1-x"] }
 base64 = "0.22"
 bitflags = "2.9.0"
 blade-graphics = { git = "https://github.com/kvark/blade", rev = "b16f5c7bd873c7126f48c82c39e7ae64602ae74f" }
@@ -436,9 +422,10 @@ globset = "0.4"
 handlebars = "6.3"
 heed = { version = "0.22.0" }
 hex = "0.4.3"
-html5ever = "0.30.0"
+html5ever = { git = "https://github.com/servo/html5ever", version = "0.30.0" }
+markup5ever_rcdom = { git = "https://github.com/servo/html5ever", version = "0.3.0" }
 hyper = "1.6"
-http = "1.3"
+http = "1.3.1"
 ignore = "0.4.23"
 image = "0.25.5"
 imara-diff = "0.1.8"
@@ -459,7 +446,6 @@ livekit = { git = "https://github.com/zed-industries/livekit-rust-sdks", rev = "
     "rustls-tls-native-roots",
 ], default-features = false }
 log = { version = "0.4.26", features = ["kv_unstable_serde", "serde"] }
-markup5ever_rcdom = "0.3.0"
 mlua = { version = "0.10", features = ["lua54", "vendored", "async", "send"] }
 nanoid = "0.4"
 nbformat = { version = "0.10.0" }
@@ -497,7 +483,8 @@ reqwest = { git = "https://github.com/zed-industries/reqwest.git", rev = "fd110f
     "socks",
     "stream",
 ] }
-rsa = "0.9.8"
+# See https://github.com/RustCrypto/RSA/pull/478
+rsa = { git = "https://github.com/RustCrypto/RSA", version = "0.10.0-pre.4" }
 runtimelib = { version = "0.25.0", default-features = false, features = [
     "async-dispatcher-runtime",
 ] }
@@ -516,7 +503,7 @@ serde_json_lenient = { version = "0.2", features = [
     "raw_value",
 ] }
 serde_repr = "0.1"
-sha2 = "0.10"
+sha2 = { git = "https://github.com/RustCrypto/hashes" }
 shellexpand = "3.1.0"
 shlex = "1.3.0"
 signal-hook = "0.3.17"
@@ -654,7 +641,11 @@ features = [
 # TODO livekit https://github.com/RustAudio/cpal/pull/891
 [patch.crates-io]
 cpal = { git = "https://github.com/zed-industries/cpal", rev = "fd8bc2fd39f1f5fdee5a0690656caff9a26d9d50" }
-real-async-tls = { git = "https://github.com/zed-industries/async-tls", rev = "1e759a4b5e370f87dc15e40756ac4f8815b61d9d", package = "async-tls" }
+# See https://github.com/RustCrypto/traits/commit/be696aa8f811a71633c3456c8030af5048d547ea
+digest = { git = "https://github.com/RustCrypto/traits/" }
+signature = { git = "https://github.com/RustCrypto/traits/" }
+crypto-primes = { git = "https://github.com/entropyxyz/crypto-primes.git" }
+crypto-bigint = { git = "https://github.com/RustCrypto/crypto-bigint.git" }
 
 [profile.dev]
 split-debuginfo = "unpacked"
@@ -769,3 +760,4 @@ too_many_arguments = "allow"
 
 [workspace.metadata.cargo-machete]
 ignored = ["bindgen", "cbindgen", "prost_build", "serde", "component", "linkme"]
+

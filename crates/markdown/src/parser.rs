@@ -356,6 +356,7 @@ impl From<pulldown_cmark::Tag<'_>> for MarkdownTag {
             pulldown_cmark::Tag::DefinitionList => MarkdownTag::DefinitionList,
             pulldown_cmark::Tag::DefinitionListTitle => MarkdownTag::DefinitionListTitle,
             pulldown_cmark::Tag::DefinitionListDefinition => MarkdownTag::DefinitionListDefinition,
+            _ => panic!("{tag:#?}"),
         }
     }
 }

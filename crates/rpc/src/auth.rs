@@ -1,6 +1,6 @@
 use anyhow::{Context as _, Result};
 use base64::prelude::*;
-use rand::{thread_rng, Rng as _};
+use rand::{rng, Rng as _};
 use rsa::pkcs1::{DecodeRsaPublicKey, EncodeRsaPublicKey};
 use rsa::traits::PaddingScheme;
 use rsa::{Oaep, Pkcs1v15Encrypt, RsaPrivateKey, RsaPublicKey};
@@ -31,7 +31,7 @@ pub struct PrivateKey(RsaPrivateKey);
 
 /// Generate a public and private key for asymmetric encryption.
 pub fn keypair() -> Result<(PublicKey, PrivateKey)> {
-    let mut rng = thread_rng();
+    let mut rng = rng();
     let bits = 2048;
     let private_key = RsaPrivateKey::new(&mut rng, bits)?;
     let public_key = RsaPublicKey::from(&private_key);
@@ -40,10 +40,10 @@ pub fn keypair() -> Result<(PublicKey, PrivateKey)> {
 
 /// Generate a random 64-character base64 string.
 pub fn random_token() -> String {
-    let mut rng = thread_rng();
+    let mut rng = rng();
     let mut token_bytes = [0; 48];
     for byte in token_bytes.iter_mut() {
-        *byte = rng.gen();
+        *byte = rng.random();
     }
     BASE64_URL_SAFE.encode(token_bytes)
 }
@@ -52,7 +52,7 @@ impl PublicKey {
     /// Convert a string to a base64-encoded string that can only be decoded with the corresponding
     /// private key.
     pub fn encrypt_string(&self, string: &str, format: EncryptionFormat) -> Result<String> {
-        let mut rng = thread_rng();
+        let mut rng = rng();
         let bytes = string.as_bytes();
         let encrypted_bytes = match format {
             EncryptionFormat::V0 => self.0.encrypt(&mut rng, Pkcs1v15Encrypt, bytes),
